@@ -1,0 +1,121 @@
+import discord
+import random
+import os
+import requests
+from discord.ext import commands
+from functions import foxpic
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+
+#command bothelp
+@bot.command()
+async def bothelp(ctx):
+    commands_info = [command.name + " " + command.signature for command in bot.commands]
+    commands_str = "\n".join(commands_info)
+
+
+    await ctx.send(f"Available commands:\n```\n{commands_str}\n``` ")
+    await ctx.send("and the prefix is '/'")
+
+
+@bot.event
+async def on_ready():
+    print(f'I am in! My codename is: "{bot.user}')
+
+#eto novaia funkcia, sdelal ee shtob protestit
+@bot.event  
+async def on_message(message): # ловит все текстовые сообщения
+    
+    if message.content == 'test':
+        await message.channel.send("How dare you even try to test me, impudent human!")
+
+    #Важно для работы команд!! 
+    await bot.process_commands(message)
+
+
+
+
+
+
+
+
+
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f"Surprise! I'm back, and my name is {bot.user}!")
+
+
+@bot.command()
+async def bye(ctx):
+    await ctx.send(f"Dont you dare talk to me like that! I'm not going anywhere!")
+
+
+
+#choice
+@bot.command(description='For when you wanna settle the score some other way')
+async def choose(ctx, *choices: str):
+    """Chooses between multiple choices."""
+    await ctx.send(random.choice(choices))
+
+
+
+#spam
+@bot.command()
+async def repeat(ctx, times: int, content='repeating...'):
+    """Repeats a message multiple times."""
+    for i in range(times):
+        await ctx.send(content)
+
+
+
+
+
+@bot.command(name='gen', description= "makes the bot generate a number of symbols")
+async def gen(ctx, length: int):
+    generated = ''
+    for i in range(length):
+        Symbols = "+-_/*!&$#?=@abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+        randomised = random.choice(Symbols)
+        generated += randomised
+
+    await ctx.send(generated)
+
+
+@bot.command()
+async def meme(ctx):
+    await ctx.send(os.listdir('bot for kodland/memes'))
+    await ctx.send("Use the command $mem and the number which resembles the meme's position on the list to choose a meme to see!")
+
+
+
+@bot.command()
+async def mem(ctx, i):
+    memelist = os.listdir('bot for kodland/memes/')
+    img = memelist[int(i)-1]
+    with open(f'bot for kodland/memes/{img}', 'rb') as f:
+        # В переменную кладем файл, который преобразуется в файл библиотеки Discord!
+        picture = discord.File(f)
+   # Можем передавать файл как параметр!
+    await ctx.send(file=picture)
+
+@bot.command()
+async def rmem(ctx, i):
+    memelist = os.listdir('bot for kodland/memes/')
+    ranmem = random.choice(memelist)
+    with open(f'bot for kodland/memes/{ranmem}', 'rb') as f:
+        picture = discord.File(f)
+        await ctx.send(file = picture)  
+
+
+#put this function into another file, and then just import it in here
+
+@bot.command()
+async def fox(ctx):
+    image_url = foxpic()
+    await ctx.send(image_url)
+    
+
